@@ -1,0 +1,17 @@
+{% extends 'home.html' %}
+{% block title %} Ввод данных {% endblock %}
+{% block content %}
+    <h2 class="ms-3 mt-5">{{ heading }}</h2>
+    {% if user_form %}
+    <form action="{% url 'edit_profile' %}" method="post" class="ms-3 mt-4" enctype="multipart/form-data">
+    {% else %}
+    <form action="{% url 'add_info' %}" method="post" class="ms-3 mt-4" enctype="multipart/form-data">
+    {% endif %}
+        {% csrf_token %}
+        {{ profile_form.as_p }}
+        {% if user_form %}
+        {{ user_form.as_p }}
+        {% endif %}
+        <button type="submit" class="btn btn-success">Сохранить</button>
+    </form>
+{% endblock %}

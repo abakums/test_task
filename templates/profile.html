@@ -1,0 +1,35 @@
+{% extends 'home.html' %}
+{% block title %} Профиль {% endblock %}
+{% block content %}
+    <div class="container mt-5 ms-4">
+        <div class="row">
+            <div class="col-sm-7 col-md-5 col-lg-3">
+                <p><img src="{{ MEDIA_URL }}{{ user.profile.avatar.url }}" alt="Аватар" height="320px" width="240px"></p>
+            </div>
+            <div class="col-sm-5 col-md-7 col-lg-9">
+                <div class="card" style="width: 25rem; height: 20rem">
+                    <div class="card-body">
+                        <h4 class="card-header">{{ user }}(id: {{ user.id }})</h4>
+                        <p class="card-text mt-2 ms-2">
+                            Фамилия: {{ user.last_name }} <br>
+                            Имя: {{ user.first_name }} <br>
+                            Отчество: {{ user.profile.patronymic }} <br>
+                        </p>
+                        {% if user.email %}
+                        <p class="card-text mt-2 ms-2">
+                            Email: {{ user.email }}
+                        </p>
+                        {% endif %}
+                        <p class="mt-5"><a href="{% url "edit_profile" %}" class="btn btn-primary">Изменить профиль</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row ms-1">
+            Личная информация: {{ user.profile.information }}
+        </div>
+    </div>
+    <div class="container mt-4 ms-4">
+        <p><a href="{% url "all_users" %}" class="btn btn-info">Смотреть всех пользователей</a></p>
+    </div>
+{% endblock %}
