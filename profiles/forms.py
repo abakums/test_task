@@ -6,7 +6,7 @@ from profiles.models import UserProfile
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = ('last_name', 'first_name', 'patronymic', 'avatar', 'information')
+        fields = ('patronymic', 'avatar', 'information')
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -18,4 +18,4 @@ class UserProfileForm(forms.ModelForm):
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ('email',)
+        fields = ('last_name', 'first_name')

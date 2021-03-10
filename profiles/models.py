@@ -9,14 +9,12 @@ class UserProfile(models.Model):
     # необходимо, чтобы в форме после регистрации они были обязательными
     # кроме того, они не отображаются в админ панеле, так как после заполнения они передают свое значение в модель User
     user = models.OneToOneField(User, on_delete=models.CASCADE)
-    first_name = models.CharField(max_length=100, verbose_name="Имя")
-    last_name = models.CharField(max_length=100, verbose_name="Фамилия")
     patronymic = models.CharField(max_length=100, verbose_name="Отчество")
     avatar = models.ImageField(upload_to="users/", verbose_name="Аватар")
     information = models.TextField(verbose_name="Информация")
 
     def __str__(self):
-        return self.first_name + " (id: " + str(self.id) + ")"
+        return self.user.username + " (id: " + str(self.id) + ")"
 
     class Meta:
         verbose_name = "Профиль"

@@ -17,6 +17,14 @@
     <a href="{% url "logout" %}" type="button" class="btn btn-secondary">Git Disconnect</a>
 {% endif %}
 </div>
-{% block content %}<h2 class="mt-4 ms-3" align="center">Авторизируйтесь в системе с помощью GitHub, нажав на кнопку вверху</h2>{% endblock %}
+{% block content %}
+    {% if not user.is_active %}
+        <h2 class="mt-4 ms-3" align="center">Авторизируйтесь в системе с помощью GitHub, нажав на кнопку вверху</h2>
+    {% else %}
+        <div align="center">
+            <a href="{% url "my_profile" %}" type="button" class="btn btn-primary">Перейти к профилю</a>
+        </div>
+    {% endif %}
+{% endblock %}
 </body>
 </html>

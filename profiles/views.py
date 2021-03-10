@@ -7,6 +7,12 @@ from django.shortcuts import render, redirect
 from profiles.forms import UserProfileForm, UserForm
 
 
+def info_is_completed(user):
+    # проверяет, заполнил ли пользователь все поля формы при вводе личной информации
+    if user.first_name != "" and user.last_name != "" and user.profile.patronymic != "":
+        return True
+
+
 def home_page(request):
     # рендеринг пользователю начальной страницы сайта
     return render(request, 'home.html')
@@ -25,31 +31,35 @@ def add_info(request):
     # или перенаправляющая на страницу профиля при повторной авторизации пользователя
     if request.method == 'POST':
         profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
-        if profile_form.is_valid():
+        user_form = UserForm(request.POST, request.FILES, instance=request.user)
+        if profile_form.is_valid() and user_form.is_valid():
             profile_form.save()
-            request.user.first_name = request.POST['first_name']
-            request.user.last_name = request.POST['last_name']
-            request.user.save()
-            messages.success(request, 'Успешное изменение профиля!')
-            return redirect('/my_profile/')
+            user_form.save()
+            if info_is_completed(request.user):
+                messages.success(request, 'Успешное изменение профиля!')
+                return redirect('/my_profile/')
+            else:
+                messages.error(request, 'Необходимо ввести все поля формы')
         else:
             messages.error(request, 'Необходимо ввести корректные значения в поля формы!')
-    elif request.user.profile.patronymic != "":
+    elif info_is_completed(request.user):
         return redirect('/my_profile/')
     else:
         profile_form = UserProfileForm(instance=request.user.profile)
-    heading = "Пожалуйста, введите свои данные в форму ниже:"
+        user_form = UserForm(instance=request.user)
+    heading = "Пожалуйста, введите все свои данные в форму ниже:"
     return render(request, 'data_input.html', {'profile_form': profile_form,
+                                               'user_form': user_form,
                                                'heading': heading})
 
 
 @login_required(login_url='/')
 def my_profile(request):
     # рендерит страницу с данными профиля пользователя, либо делает редирект на страницу для их заполнения
-    if request.user.profile.patronymic != "":
+    if info_is_completed(request.user):
         return render(request, 'profile.html')
     else:
-        return redirect('/')
+        return redirect('/add_info/')
 
 
 @login_required(login_url='/')
@@ -57,19 +67,17 @@ def my_profile(request):
 def edit_profile(request):
     # метод для изменения информации о пользователе
     # используются две формы, которые отправляются на сервер одной кнопкой
-    # одна форма для ввода поля 'email' экземпляров User, вторая - для изменения полей у экземпляров UserProfile
     if request.method == 'POST':
         profile_form = UserProfileForm(request.POST, request.FILES, instance=request.user.profile)
         user_form = UserForm(request.POST, request.FILES, instance=request.user)
         if profile_form.is_valid() and user_form.is_valid():
             profile_form.save()
             user_form.save()
-            request.user.first_name = request.POST['first_name']
-            request.user.last_name = request.POST['last_name']
-            request.user.email = request.POST['email']
-            request.user.save()
-            messages.success(request, 'Успешное изменение профиля!')
-            return redirect('/my_profile/')
+            if info_is_completed(request.user):
+                messages.success(request, 'Успешное изменение профиля!')
+                return redirect('/my_profile/')
+            else:
+                messages.error(request, 'Необходимо ввести все поля формы')
         else:
             messages.error(request, 'Необходимо ввести корректные значения в поля формы!')
     else:
@@ -85,7 +93,7 @@ def edit_profile(request):
 def all_users(request):
     # рендеринг страницы со вписком всех пользователей
     # для пользователей, не вводивших свои данные после регистрации - перенаправление на страницу для их ввода
-    if request.user.profile.patronymic != '':
+    if info_is_completed(request.user):
         users = User.objects.all()
         return render(request, 'all_users.html', {'users': users})
     else:
